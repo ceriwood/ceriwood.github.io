@@ -34,16 +34,17 @@
     <link rel="stylesheet" type="text/css" href="/css/style.css" />
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     
-    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
     <script src="/modernizr-custom.js"></script>
 </head>
 <body id="music-page">
+<div id="outdated"></div>
 
-<main role="main">
+<main role="main" itemscope itemtype="http://schema.org/MusicGroup">
     <header id="music-header">
         <img src="/img/music/cclef.svg" width="110" height="110">
-        <h1><img src="/img/cw-logo-black.svg" width="280" alt="Ceri Wood logo"></h1>
-        <h2>Vocalist with over 10 years teaching experience.</h2>
+        <h1><a href="/"><img itemprop="image" src="/img/cw-logo-black.svg" width="280" alt="Ceri Wood" title="Ceri Wood"></a></h1>
+        <meta itemprop="name" content="Ceri Wood">
+        <h2 itemprop="description">Vocalist with over 10 years teaching experience.</h2>
         <p>[&nbsp;Sorry, I don’t drive! But I have great hair. <a href="mailto:ceriwoodmusic@gmail.com">ceriwoodmusic@gmail.com</a>&nbsp;]</p>
     </header>
     
@@ -53,34 +54,37 @@
         </div>
 
         <ul id="tracklist">
-            <li>
+            <li itemprop="track" itemscope itemtype="http://schema.org/MusicRecording">
                 <a href="/music/samples/blackbird.mp3">
+                    <meta itemprop="url" content="/music/samples/blackbird.mp3">
                     <button tabindex="-1" class="play-state-btn play-state-btn-small">
                         <span class="play-icon" title="Play"></span>
                         <span class="pause-icon" title="Pause"></span>
                     </button>
-                    <h4>Blackbird</h4>
-                    <p>2 mins 24 secs</p>
+                    <h4 itemprop="name">Blackbird</h4>
+                    <p><meta itemprop="duration" content="PT2M24S">2 mins 24 secs</p>
                 </a>
             </li>
-            <li>
+            <li itemprop="track" itemscope itemtype="http://schema.org/MusicRecording">
                 <a href="/music/samples/celeste.mp3">
+                    <meta itemprop="url" content="/music/samples/celeste.mp3">
                     <button tabindex="-1" class="play-state-btn play-state-btn-small">
                         <span class="play-icon" title="Play"></span>
                         <span class="pause-icon" title="Pause"></span>
                     </button>
-                    <h4>Celeste</h4>
-                    <p>3 mins 46 secs</p>
+                    <h4 itemprop="name">Celeste</h4>
+                    <p><meta itemprop="duration" content="PT3M46S">3 mins 46 secs</p>
                 </a>
             </li>
-            <li>
+            <li itemprop="track" itemscope itemtype="http://schema.org/MusicRecording">
                 <a href="/music/samples/sweet-love.mp3">
+                    <meta itemprop="url" content="/music/samples/sweet-love.mp3">
                     <button tabindex="-1" class="play-state-btn play-state-btn-small">
                         <span class="play-icon" title="Play"></span>
                         <span class="pause-icon" title="Pause"></span>
                     </button>
-                    <h4>Sweet Love</h4>
-                    <p>3 mins 18 secs</p>
+                    <h4 itemprop="name">Sweet Love</h4>
+                    <p><meta itemprop="duration" content="PT3M18S">3 mins 18 secs</p>
                 </a>
             </li>
         </ul>
@@ -94,6 +98,7 @@
         
         <span class="progress-bar">
             <span class="progress-bar-inner"></span>
+            <span class="time-elapsed"></span>
         </span>
     </div>
 </main>
@@ -101,9 +106,19 @@
 <footer id="music-footer">
     <p>Looking for my photography? Visit <a href="http://ceriwoodphotography.com">ceriwoodphotography.com</a></p>
 </footer>
-    
+
+<script src="/js/outdatedbrowser.min.js"></script>
 <script>
+    outdatedBrowser({
+        bgColor: '#66941c',
+        color: '#ffffff',
+        lowerThan: 'transform',
+        languagePath: 'your_path/outdatedbrowser/lang/en.html'
+    });
+</script>
     
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script>
     // --- Music player
     function Player(){
         this.audio = new Audio();
@@ -163,7 +178,7 @@
             var x = clientX - parseFloat($bar.offset().left);
             var width = $bar.outerWidth(false);
             
-            x = (x < 0) ? 0 : (x > width) ? width : x;
+            x = (x < 0) ? 0 : (x >= width) ? width - 1 : x;
             var percent = (x/width) * 100;
 
             $bar.find('.progress-bar-inner').css('width', percent + '%');
@@ -194,6 +209,9 @@
             var percent = (currentTime/duration) * 100;
             
             $('.progress-bar-inner').css('width', percent + '%');
+            $('.time-elapsed')
+                .text(Math.floor(currentTime/60) + 'm ' + Math.floor(currentTime%60) + 's')
+                .css('left', percent + '%');
         },
         
         changeTrack: function(){
@@ -270,6 +288,7 @@
             this.currentlyPlaying = '';
             $('.progress-bar').removeClass('active').find('.progress-bar-inner').removeAttr('style');
             $('#tracklist').find('.selected').removeClass('selected');
+            $('.time-elapsed').empty();
         }
     };
     
