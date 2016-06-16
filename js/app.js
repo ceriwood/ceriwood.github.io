@@ -9,6 +9,7 @@ function App(){
         photoPrefix: 'CWP - ',
         photosets: [],
         activeSet: 0,
+        albumRetries: 0,
         
         el: {
             $nav: $('#page-nav-container')
@@ -107,10 +108,14 @@ App.prototype = {
         });
 
         xhr.fail(function(err){
-            // @TODO - add error message saying album list couldn't be loaded
-            console.error(err);
+            if (self.c.albumRetries < 3) {
+                self.c.albumRetries ++;
+                self.getPhotosets();
+                return;
+            }
             
-            // @TODO - perhaps try a few more times before giving up? Maybe check offline status?
+            // Album list couldn't be loaded
+            $('#album-list').prepend('<p>Album list couldn\'t be loaded. Try <a href="/">refreshing the page</a></p>').find('.loading-container').remove();
         });
     },
     
@@ -120,7 +125,7 @@ App.prototype = {
             html += '<li><a href="#' + obj.title + '" data-album-id="' + obj.id + '">' + obj.title + '</a></li>';
         });
         
-        $('#album-list').prepend(html);
+        $('#album-list').prepend(html).find('.loading-container').remove();
     },
     
     getPhotos: function(){
