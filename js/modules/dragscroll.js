@@ -1,4 +1,5 @@
 var raf = require('raf');
+var feature = require('feature.js');
 
 function dragScroll(){
     var tickInterval = 20;
@@ -16,8 +17,6 @@ function dragScroll(){
     }
 
     function mouseDown(e){
-        if (feature.touch || $(window).width() <= 480) return;
-
         curDown = true;
         originXScroll = getPageScroll();
         originXPos = curXPos = e.clientX;
@@ -91,6 +90,8 @@ function dragScroll(){
     
     return {
         bind: function(){
+            if (feature.touch || $(window).width() <= 480) return;
+            
             window.addEventListener('mousedown', mouseDown);
             window.addEventListener('mousemove', mouseMove);
             window.addEventListener('mouseup', mouseUp);

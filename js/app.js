@@ -1,4 +1,3 @@
-var feature = require('feature.js');
 var dragscroll = require('./modules/dragscroll');
 
 function App(){
