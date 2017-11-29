@@ -1,5 +1,5 @@
 var feature = require('feature.js');
-var raf = require('raf');
+var dragscroll = require('./modules/dragscroll');
 
 function App(){
     // Store constants here
@@ -21,11 +21,6 @@ App.prototype = {
     init: function(){
         this.bindEvents();
         this.route();
-        this.setConstants();
-    },
-    
-    setConstants: function(){
-        // Set any required constants (e.g. widths/heights) here
     },
 
     bindEvents: function(){
@@ -33,11 +28,7 @@ App.prototype = {
             this.route();
         }.bind(this));
         
-        $(window).on('resize', function(){
-            this.setConstants();
-        }.bind(this));
-        
-        this.dragScroll();
+        dragscroll.bind();
     },
     
     route: function(){
@@ -46,13 +37,6 @@ App.prototype = {
         // First load - fetch photosets
         if (this.c.photosets.length == 0) {
             this.getPhotosets();
-            return;
-        }
-        
-        if (curUrl == 'contact') {
-            this.c.activeSet = 0;
-            this.selectNavElement('contact');
-            this.showContactArea();
             return;
         }
         
@@ -70,7 +54,7 @@ App.prototype = {
         }
         
         this.selectNavElement(photosetToSelect.title)
-        this.showPhotoArea();
+        this.getPhotos();
     },
     
     selectNavElement: function(title){
@@ -174,66 +158,6 @@ App.prototype = {
         });
 
         $('#photo-container').html(html);
-    },
-    
-    showPhotoArea: function(){
-        this.getPhotos();
-        
-        console.log('hide contact area');
-    },
-    
-    showContactArea: function(){
-        console.log('show contact area');
-    },
-    
-    dragScroll: function(){
-        var curXPos = 0;
-        var curDown = false;
-        var xPosArr = [];
-
-        window.addEventListener('mousedown', function(e){
-            if (feature.touch || $(window).width() <= 480) return;
-            
-            xPosArr = [e.pageX];
-            curDown = true;
-            curXPos = e.pageX;
-        });
-        
-        window.addEventListener('mousemove', function(e){ 
-            if(curDown === false) return;
-            
-            var toPosX = document.body.scrollLeft + (curXPos - e.pageX);
-            
-            xPosArr.unshift(toPosX)
-            
-            window.scrollTo(toPosX, document.body.scrollTop);
-        });
-        
-        window.addEventListener('mouseup', function(e){
-            if (curDown == false) return;
-            curDown = false;
-            
-            if (xPosArr.length < 3) return;
-            
-            animScroll(xPosArr);
-        });
-        
-        function animScroll(arr){
-            var decel = 1.1; // deceleration - higher = faster
-            var dist = Math.round((arr[0] - arr[2]) / decel);
-            
-            var loop = raf(function tick(){
-                if (dist <= 1 && dist >= -1) {
-                    raf.cancel(loop);
-                    return;
-                }
-                
-                dist = dist / decel;
-                
-                window.scrollTo(document.body.scrollLeft + dist, document.body.scrollTop);
-                raf(tick);
-            });
-        }
     }
 };
 
