@@ -58,6 +58,15 @@ function dragScroll(){
 
         animScroll();
     }
+    
+    function mouseWheel(e){
+        if (e.deltaY === 0) return;
+        
+        // Emulate a mouse flick
+        xPosArr = [0, e.deltaY];
+        
+        animScroll();
+    }
 
     function animScroll(){
         if (xPosArr.length < 2) return;
@@ -85,6 +94,7 @@ function dragScroll(){
             window.addEventListener('mousedown', mouseDown);
             window.addEventListener('mousemove', mouseMove);
             window.addEventListener('mouseup', mouseUp);
+            window.addEventListener('wheel', mouseWheel);
         },
         unbind: function(){
             window.removeEventListener('mousedown', mouseDown);
